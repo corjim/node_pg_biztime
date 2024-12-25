@@ -23,8 +23,28 @@ CREATE TABLE invoices (
     CONSTRAINT invoices_amt_check CHECK ((amt > (0)::double precision))
 );
 
+
+-- The industries table
+CREATE TABLE industries (
+    code text PRIMARY KEY,
+    industry text NOT NULL UNIQUE
+);
+
+-- The company_industries table (junction table)
+CREATE TABLE company_industries (
+    company_code text NOT NULL,
+    industry_code text NOT NULL,
+    PRIMARY KEY (company_code, industry_code),
+    FOREIGN KEY (company_code) REFERENCES companies(code) ON DELETE CASCADE,
+    FOREIGN KEY (industry_code) REFERENCES industries(code) ON DELETE CASCADE
+);
+
+
+
+
 INSERT INTO companies
   VALUES ('apple', 'Apple Computer', 'Maker of OSX.'),
+  ('healthplus', 'HealthPlus', 'Healthcare services provider'),
          ('ibm', 'IBM', 'Big blue.');
 
 INSERT INTO invoices (comp_Code, amt, paid, paid_date)
@@ -32,3 +52,17 @@ INSERT INTO invoices (comp_Code, amt, paid, paid_date)
          ('apple', 200, false, null),
          ('apple', 300, true, '2018-01-01'),
          ('ibm', 400, false, null);
+
+INSERT INTO industries (code, industry)
+VALUES
+    ('tech', 'Technology'),
+    ('health', 'Healthcare'),
+    ('sustain', 'Sustainability'),
+    ('acct', 'Accounting');
+
+INSERT INTO company_industries (company_code, industry_code)
+VALUES
+    ('apple', 'tech'), 
+    ('ibm', 'health'),
+    ('healthplus',"health")
+    

@@ -18,9 +18,18 @@ router.get("/", async (req, res, next) => {
 router.get("/:code", async (req, res, next) => {
     try {
         const { code } = req.params;
-        const companyRes = await db.query(`SELECT code, name, description
-        FROM companies 
-        WHERE code = $1`, [code])
+        const companyRes = await db.query(`SELECT 
+            c.code AS company_code,
+            c.name AS company_name,
+            c.description AS company_description,
+            i.industry AS industry_name
+            FROM companies c 
+            LEFT JOIN 
+            company_industries ci ON c.code = ci.company_code
+            LEFT JOIN 
+            industries i ON ci.industry_code = i.code
+            WHERE 
+            c.code = $1`, [code])
 
         const invResult = await db.query(
             `SELECT id
@@ -40,7 +49,7 @@ router.get("/:code", async (req, res, next) => {
         return res.json({ "company": company });
 
     } catch (err) {
-        return (err)
+        return (err);
     }
 
 })
@@ -89,6 +98,7 @@ router.put("/:code", async function (req, res, next) {
     }
 
 });
+
 // Deletes a company
 router.delete("/:code", async function (req, res, next) {
     try {
